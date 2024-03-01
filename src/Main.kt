@@ -1,3 +1,8 @@
+import Controllers.CourseController
+import Models.Course
+import Views.CourseView
+import kotlin.random.Random
 fun main() {
-    println("Hello World!")
+    CourseView::optionsMenu.invoke(CourseView())
+
 }
