@@ -1,32 +1,38 @@
 package Controllers
+import Helpers.RegistryObject
+import Helpers.generateRandomCode
 import Models.Course
 import Models.Student
 import Models.Assessment
 import kotlin.random.Random
 
 class CourseController {
-    private var courses: MutableList<Course> = mutableListOf()
+    //private var courses: MutableList<Course> = mutableListOf()
 
     fun createCourse(name: String, code:String) : Boolean{
         if (name.isEmpty() || code.isEmpty()) return false
         val newCourse = Course(generateRandomCode(), name, code)
-        courses.add(newCourse)
+        RegistryObject.courses.add(newCourse)
         return true
     }
 
-    fun addStudentToCourse(courseId: String, studentName: String): Boolean {
-        val course = courses.find { it.id == courseId }
-        if (course != null) {
-            val newStudent = Student(generateRandomCode(), studentName)
-            course.students.add(newStudent)
+    fun addStudentToCourse(courseId: String, studentId: String): Boolean {
+        val course = RegistryObject.courses.find { it.id == courseId }
+        val selectedStudent = RegistryObject.students.find { it.id == studentId }
+        if (course != null && selectedStudent != null) {
+            if(course.students.contains(selectedStudent)){
+                return false
+            }
+            selectedStudent.courses.add(course)
+            course.students.add(selectedStudent)
             return true
         }
         return false
     }
 
     fun addAssessmentToCourse(courseId: String, assessmentName: String, percentage: Double): Boolean {
-        val course = courses.find { it.id == courseId }
-        if (course != null) {
+        val course = RegistryObject.courses.find { it.id == courseId }
+        if (course != null && percentage in 0.0..100.0) {
             val newAssessment = Assessment(generateRandomCode(), assessmentName, percentage)
             course.assessments.add(newAssessment)
             return true
@@ -35,7 +41,7 @@ class CourseController {
     }
 
     fun addQualificationToStudent(courseId: String, studentId: String, assessmentId: String, qualification: Double): Boolean {
-        val course = courses.find { it.id == courseId }
+        val course = RegistryObject.courses.find { it.id == courseId }
         if (course != null) {
             val student = course.students.find { it.id == studentId }
             if (student != null) {
@@ -46,6 +52,7 @@ class CourseController {
                         student.qualifications.removeIf { it.first == course.name && it.second == assessment.name }
                     }
                     student.qualifications.add(Triple(course.name, assessment.name, qualification))
+                    StudentController().addQualificationToStudent(studentId, courseId, assessmentId, qualification)
                     return true
                 }
             }
@@ -55,7 +62,7 @@ class CourseController {
 
     fun showCourses(){
         //return (courses[0].students)
-        for (course in courses){
+        for (course in RegistryObject.courses){
             println("Curso: ${course.name}")
             println("Codigo: ${course.code}")
             for (student in course.students){
@@ -68,7 +75,7 @@ class CourseController {
     }
 
     fun showQualifications(courseId: String){
-        val course = courses.find { it.id == courseId }
+        val course = RegistryObject.courses.find { it.id == courseId }
         // println("Curso: ${course.name}")
         if (course != null) {
             for (student in course.students){
@@ -82,14 +89,6 @@ class CourseController {
     }
 
     fun getCourses(): MutableList<Course>{
-        return courses
-    }
-
-    private fun generateRandomCode(): String {
-        val charPool : List<Char> = ('a'..'z') + ('0'..'9') // Define the character pool
-        return (1..4)
-            .map { Random.nextInt(0, charPool.size) } // Generate random indices
-            .map(charPool::get) // Map the indices to characters from the pool
-            .joinToString("") // Join the characters to form a string
+        return RegistryObject.courses
     }
 }
