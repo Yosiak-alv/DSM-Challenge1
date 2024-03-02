@@ -1,10 +1,9 @@
 package Views
 import Controllers.CourseController
-import Controllers.StudentController
 import Helpers.RegistryObject
 import Helpers.clearScreen
 import Helpers.pressAnyKey
-import java.util.*
+
 
 class CourseView {
     private var courseController = CourseController()
@@ -159,9 +158,7 @@ class CourseView {
     }
 
     fun showStudent(){ //TODO revisar
-        clearScreen()
         StudentView().showStudentHistory()
-        pressAnyKey()
     }
 
 }

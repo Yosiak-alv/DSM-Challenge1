@@ -13,19 +13,15 @@ class StudentController {
     }
 
     fun addQualificationToStudent(studentId: String, courseId: String, assessmentId: String, qualification: Double): Boolean {
-        val student = RegistryObject.students.find { it.id == studentId }
-        val course = RegistryObject.courses.find { it.id == courseId }
-        val assessment = course?.assessments?.find { it.id == assessmentId }
 
-        if (student != null && course != null && assessment != null) {
-            if (student.qualifications.any { it.first == course.name && it.second == assessment.name }) //self update
-            {
-                student.qualifications.removeIf { it.first == course.name && it.second == assessment.name }
-            }
-            student.qualifications.add(Triple(course.name, assessment.name, qualification))
-            return true
-        }
-        return false
+        val course = RegistryObject.courses.find { it.id == courseId } ?: return false
+        val student = RegistryObject.students.find { it.id == studentId } ?: return false
+        val assessment = course.assessments.find { it.id == assessmentId } ?: return false
+
+        // Check if the qualification already exists, remove it if found
+        student.qualifications.removeIf { it.first == course.name && it.second == assessment.name }
+        student.qualifications.add(Triple(course.name, assessment.name, qualification)) //to course.student
+        return true
     }
 
     fun viewStudents() {
@@ -41,7 +37,6 @@ class StudentController {
         var average = 0.0
 
         if (course != null && assessments != null && student != null){
-            //add assessment to student
             println("-----------------------------------")
             println("Estudiante: ${student.name}")
             for(assessment in assessments) {
@@ -50,7 +45,7 @@ class StudentController {
                 for (qualification in student.qualifications) {
                     if (assessment.name == qualification.second) {
                         println("Nota: ${qualification.third}")
-                        // average
+
                         val sum = (qualification.third * assessment.percentage) / 100
                         average += sum
                     }
@@ -63,5 +58,4 @@ class StudentController {
         }
         return false
     }
-
 }

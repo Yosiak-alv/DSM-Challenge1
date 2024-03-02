@@ -44,28 +44,20 @@ class CourseController {
     }
 
     fun addQualificationToStudent(courseId: String, studentId: String, assessmentId: String, qualification: Double): Boolean {
-        val course = RegistryObject.courses.find { it.id == courseId }
-        if (course != null) {
-            val student = course.students.find { it.id == studentId }
-            if (student != null) {
-                val assessment = course.assessments.find { it.id == assessmentId }
-                if (assessment != null) {
-                    if (student.qualifications.any { it.first == course.name && it.second == assessment.name }) //self update
-                    {
-                        student.qualifications.removeIf { it.first == course.name && it.second == assessment.name }
-                    }
-                    student.qualifications.add(Triple(course.name, assessment.name, qualification))
-                    StudentController().addQualificationToStudent(studentId, courseId, assessmentId, qualification)
-                    return true
-                }
-            }
-        }
-        return false
+
+        val course = RegistryObject.courses.find { it.id == courseId } ?: return false
+        val student = course.students.find { it.id == studentId } ?: return false
+        val assessment = course.assessments.find { it.id == assessmentId } ?: return false
+
+        // Check if the qualification already exists, remove it if found
+        student.qualifications.removeIf { it.first == course.name && it.second == assessment.name }
+
+        student.qualifications.add(Triple(course.name, assessment.name, qualification)) //to course.student
+        StudentController().addQualificationToStudent(studentId, courseId, assessmentId, qualification) // students.qualifications
+        return true
     }
 
     fun showCourses(){
-        //return (courses[0].students)
-
         for (course in RegistryObject.courses){
             println("-----------------------------------")
             println("Curso: ${course.name}")
