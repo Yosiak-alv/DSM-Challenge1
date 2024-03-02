@@ -38,10 +38,10 @@ class CourseView {
     fun createCourse(){
         clearScreen()
         print("Ingrese el nombre del curso: ")
-        val name = readlnOrNull()
+        val name = readlnOrNull().toString()
         print("Ingrese el codigo del curso: ")
-        val code = readlnOrNull()
-        if(courseController.createCourse(name!!, code!!)){
+        val code = readlnOrNull().toString()
+        if(courseController.createCourse(name, code)){
             println("Curso creado con exito")
         }else{
             println("Error al crear el curso")
@@ -87,14 +87,14 @@ class CourseView {
             val courseId = idInput
             print("Ingrese el nombre de la evaluacion: ")
             val assessmentName = readlnOrNull()
-            print("Ingrese el porcentaje de la evaluacion: ")
+            print("Ingrese el porcentaje de la evaluacion (MAX 100 -> Ej: 20): ")
             val percentage = readlnOrNull()?.toDoubleOrNull()
 
             if (percentage != null && assessmentName != null && courseId != null) {
                 if(courseController.addAssessmentToCourse(courseId.toString(), assessmentName.toString(), percentage.toDouble())){
                     println("Evaluacion agregada con exito")
                 }else{
-                    println("Error al agregar la evaluacion o no existe el curso asociado")
+                    println("No existe el curso asociado o el porcentaje de evaluaciones supera el 100%")
                 }
             }else
             {
@@ -134,7 +134,11 @@ class CourseView {
         print("Digite la nota : ")
         val qualification = readlnOrNull()?.toDoubleOrNull()
 
-        if(courseController.addQualificationToStudent(courseId!!, studentId!!, assessmentId!!, qualification!!)) println("Calificacion agregada con exito") else println("Error al agregar la calificacion")
+        if (qualification != null && courseId != null && studentId != null && assessmentId != null) {
+            if(courseController.addQualificationToStudent(courseId.toString(), studentId.toString(), assessmentId.toString(), qualification.toDouble())) println("Calificacion agregada con exito") else println("Error al agregar la calificacion")
+        }else {
+            println("No puede agregar una calificacion sin nota, curso, estudiante o evaluacion asociada")
+        }
         pressAnyKey()
     }
 
@@ -150,26 +154,13 @@ class CourseView {
         }
         print("Seleccione el curso por ID: ")
         val courseId = readlnOrNull()
-        courseController.showQualifications(courseId!!)
+        courseController.showQualifications(courseId.toString())
         pressAnyKey()
     }
 
-    fun showStudent(){
+    fun showStudent(){ //TODO revisar
         clearScreen()
-        for (student in RegistryObject.students){
-            println("ID: ${student.id} - Nombre: ${student.name}")
-        }
-        print("Seleccione el Estudiante por ID: ")
-        val studentId = readlnOrNull()
-        for (course in courseController.getCourses()){
-            println("ID: ${course.id} - Nombre: ${course.name} - Codigo: ${course.code}")
-        }
-        print("Seleccione el curso por ID: ")
-        val courseId = readlnOrNull()
-        for (student in RegistryObject.students){
-            println("ID: ${student.id} - Nombre: ${student.name}")
-        }
-        StudentController().viewStudent(studentId.toString(),courseId.toString())
+        StudentView().showStudentHistory()
         pressAnyKey()
     }
 

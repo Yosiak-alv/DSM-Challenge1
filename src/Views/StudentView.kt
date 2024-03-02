@@ -47,7 +47,7 @@ class StudentView {
         StudentController().viewStudents()
         pressAnyKey()
     }
-    private fun showStudentHistory() {
+    fun showStudentHistory() {
         clearScreen()
         StudentController().viewStudents()
         print("Seleccione el Estudiante por su ID: ")
@@ -60,7 +60,7 @@ class StudentView {
         }
         print("Seleccione el curso por ID: ")
         val courseId = readlnOrNull()
-        StudentController().viewStudent(userStudentId.toString(),courseId.toString())
+        if(!StudentController().viewStudent(userStudentId.toString(),courseId.toString())) println("Error al mostrar el expediente")
         pressAnyKey()
     }
 }
