@@ -16,7 +16,7 @@ class CourseController {
         return true
     }
 
-    fun addStudentToCourse(courseId: String, studentId: String): Boolean {
+    fun addStudentToCourse(courseId: String, studentId: String): Boolean { //TODO Error cuando no se selecciona curso en el do while
         val course = RegistryObject.courses.find { it.id == courseId }
         val selectedStudent = RegistryObject.students.find { it.id == studentId }
         if (course != null && selectedStudent != null) {
@@ -30,9 +30,12 @@ class CourseController {
         return false
     }
 
-    fun addAssessmentToCourse(courseId: String, assessmentName: String, percentage: Double): Boolean {
+    fun addAssessmentToCourse(courseId: String, assessmentName: String, percentage: Double): Boolean { //TODO Error cuando no se selecciona curso en el do while
         val course = RegistryObject.courses.find { it.id == courseId }
         if (course != null && percentage in 0.0..100.0) {
+            //check all assessment sum is less than 100
+            val sum = course.assessments.sumOf { it.percentage }
+            if (sum + percentage > 100) return false
             val newAssessment = Assessment(generateRandomCode(), assessmentName, percentage)
             course.assessments.add(newAssessment)
             return true
@@ -62,7 +65,9 @@ class CourseController {
 
     fun showCourses(){
         //return (courses[0].students)
+
         for (course in RegistryObject.courses){
+            println("-----------------------------------")
             println("Curso: ${course.name}")
             println("Codigo: ${course.code}")
             for (student in course.students){
@@ -72,6 +77,7 @@ class CourseController {
                 println("Evaluacion: ${assessment.name} - Porcentaje: ${assessment.percentage}")
             }
         }
+        println("-----------------------------------")
     }
 
     fun showQualifications(courseId: String){
@@ -79,13 +85,18 @@ class CourseController {
         // println("Curso: ${course.name}")
         if (course != null) {
             for (student in course.students){
+                println("-----------------------------------")
                 println("Estudiante: ${student.name}")
-                for (qualification in student.qualifications){
-                    println("Curso: ${qualification.first} Evaluacion: ${qualification.second} - Nota: ${qualification.third}")
+                for (assessment in course.assessments){
+                    for (qualification in student.qualifications){
+                        if (qualification.first == course.name && qualification.second == assessment.name){
+                            println("Evaluacion: ${qualification.second} - Nota: ${qualification.third}")
+                        }
+                    }
                 }
             }
+            println("-----------------------------------")
         }
-
     }
 
     fun getCourses(): MutableList<Course>{
