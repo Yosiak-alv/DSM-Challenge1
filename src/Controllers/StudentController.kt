@@ -34,26 +34,34 @@ class StudentController {
         }
     }
 
-    fun viewStudent(studentId: String, courseId: String) {
+    fun viewStudent(studentId: String, courseId: String):Boolean {
         val student = RegistryObject.students.find { it.id == studentId }
         val course = RegistryObject.courses.find { it.id == courseId }
         val assessments = course?.assessments
         var average = 0.0
-        println("Estudiante: ${student?.name}")
+
         if (course != null && assessments != null && student != null){
             //add assessment to student
+            println("-----------------------------------")
+            println("Estudiante: ${student.name}")
             for(assessment in assessments) {
+                println("-----------------------------------")
+                println("Evaluacion: ${assessment.name} - Porcentaje: ${assessment.percentage}")
                 for (qualification in student.qualifications) {
                     if (assessment.name == qualification.second) {
-                        println("Evaluacion: ${qualification.second} - Porcentaje: ${assessment.percentage} - Nota: ${qualification.third}")
+                        println("Nota: ${qualification.third}")
                         // average
                         val sum = (qualification.third * assessment.percentage) / 100
                         average += sum
                     }
                 }
             }
+            println("-----------------------------------")
             println("Promedio: $average")
+            println("-----------------------------------")
+            return true
         }
+        return false
     }
 
 }
